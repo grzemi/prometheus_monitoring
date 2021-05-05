@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.26.0
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+ 
+  rabbitmq:
+    image: rabbitmq:3.8.15-management
+    hostname: rabbitmq
+    expose:
+      - "9090"
+    ports:
+      - "15672:15672"
+
+  rabbitmq_exporter:
+    image: kbudde/rabbitmq-exporter:sha-51501ca
+    ports:
+      - "9999:9090"
+    environment:
+      RABBIT_URL: "http://rabbitmq:15672"
+      PUBLISH_PORT: "9090"
+      OUTPUT_FORMAT: "JSON"
+      LOG_LEVEL: "debug"
+      RABBIT_CAPABILITIES: "compat"
+    depends_on: 
+      - rabbitmq
+
+  redis:
+    image: redis:6.2.3
+    ports:
+      - "6379:6379"
+    depends_on: 
+      - rabbitmq_exporter
+    
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.23.0
+    ports:
+      - "9121:9121"
+    command: 
+      - --redis.addr=redis://redis:6379
+    depends_on: 
+      - redis
+
+  grafana:
+    image: grafana/grafana:7.5.5
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana

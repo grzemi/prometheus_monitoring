@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+scrape_configs:
+- job_name: prometheus
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  follow_redirects: true
+  static_configs:
+  - targets:
+    - localhost:9090
+- job_name: redis_exporter
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  static_configs:
+  - targets: 
+    - redis_exporter:9121
+- job_name: rabbitmq_exporter
+  honor_timestamps: true
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  follow_redirects: true
+  static_configs:
+  - targets:
+    - rabbitmq_exporter:9090
