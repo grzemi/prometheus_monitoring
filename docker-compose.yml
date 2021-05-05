@@ -12,7 +12,6 @@ services:
  
   rabbitmq:
     image: rabbitmq:3.8.15-management
-    hostname: rabbitmq
     expose:
       - "9090"
     ports:
